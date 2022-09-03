@@ -116,12 +116,12 @@ def max_subseq(n, t):
     5
     """
 
-    if n < 10:
-        return n
+    if n == 0:
+        return 0
     elif t == 0:
         return 0
     else:
-        return max(max_subseq(n // 10, t - 1) + n % 10, max_subseq(n // 10, t))
+        return max(max_subseq(n // 10, t - 1) * 10 + n % 10, max_subseq(n // 10, t))
 
 
 def add_chars(w1, w2):
