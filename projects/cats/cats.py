@@ -20,6 +20,14 @@ def choose(paragraphs, select, k):
     return output_list[k] if k <= len(output_list) - 1 else ''
     # END PROBLEM 1
 
+def leave_lower_cha(inputstr):
+        output = ''
+        for char in inputstr:
+            if char.isalpha():
+                output += char
+        output = output.lower()
+        return output
+
 
 def about(topic):
     """Return a select function that returns whether a paragraph contains one
@@ -33,18 +41,15 @@ def about(topic):
     """
     assert all([lower(x) == x for x in topic]), 'topics should be lowercase.'
     # BEGIN PROBLEM 2
-    def select(key_words):
-        key_list = [words.lower() for words in key_words.split()]
+
+    def select(target_words):
+        target_list = [words.lower() for words in target_words.split()]
         true_saver = False
-        index = max(len(key_list),len(topic))
-        while k <
         for item in topic:
-            for key in key_list:
-                print (item,key)
-                if item == key:
-                    true_saver = True
+            for target in target_list:               
+                if item == leave_lower_cha(target):
+                    true_saver = True    
         return true_saver
-        
     return select
     # END PROBLEM 2
 
@@ -83,7 +88,7 @@ def wpm(typed, elapsed):
     """Return the words-per-minute (WPM) of the TYPED string."""
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
-    
+    return (len(typed) / 5) / (elapsed / 60)
     # END PROBLEM 4
 
 
