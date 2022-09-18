@@ -22,7 +22,7 @@ def choose(paragraphs, select, k):
 
 def leave_lower_cha(inputstr):
         output = ''
-        for char in inputstr:
+        for char in inputstr:       
             if char.isalpha():
                 output += char
         output = output.lower()
@@ -45,11 +45,14 @@ def about(topic):
     def select(target_words):
         target_list = [words.lower() for words in target_words.split()]
         true_saver = False
+        index = max(len(target_list),len(topic))
+        
         for item in topic:
             for target in target_list:               
                 if item == leave_lower_cha(target):
                     true_saver = True    
         return true_saver
+        
     return select
     # END PROBLEM 2
 
@@ -98,9 +101,22 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     than LIMIT.
     """
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    diff_word_set = [(diff_function(user_word,valid_single,limit),valid_single) for valid_single in valid_words]
+    min_diff = limit
+    valid_dict = {}
+    for item in diff_word_set:
+        if item[0] <= limit and item[0] <= min_diff:
+            min_diff = item[0]
+            valid_dict.setdefault(min_diff, [])
+            valid_dict[min_diff] .append(item[1])
+            min_key = min([key for key in valid_dict.keys()])
+    return user_word if user_word in valid_words or valid_dict == {} else valid_dict[min_key][0]
     # END PROBLEM 5
 
+
+def log_diff(t=0):
+    t += 1
+    return t
 
 def shifty_shifts(start, goal, limit):
     """A diff function for autocorrect that determines how many letters
@@ -108,30 +124,133 @@ def shifty_shifts(start, goal, limit):
     their lengths.
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+
+    abs_diff = abs(len(goal) - len(start))
+    if limit >= 0:  
+        if start == '' or goal == '':
+            return abs_diff
+        elif start[0] != goal[0]:
+            return 1 + shifty_shifts(start[1:],goal[1:],limit-1)
+        else:
+            return shifty_shifts(start[1:],goal[1:],limit)
+    else:
+        return 0
+            
     # END PROBLEM 6
 
 
-def pawssible_patches(start, goal, limit):
+def pawssible_patches(s, g, l):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
 
-    if ______________: # Fill in the condition
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    # Note that you don't have to make the function to do exactly how the procedure works 
+    # but rather take note of how many TIMES the opertion runs. So no need for helper function
+    # nor return a modified string(it'll do nothing but increase the difficulty).
 
-    elif ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
+    if l >= 0 and s != g:
+        if s == '' and g == '':
+            return 0
+        elif s == '' or g == '':
+            return abs(len(s) - len(g))
+        elif s[0] == g[0]:
+            return pawssible_patches(s[1:],g[1:],l)
+        else:
+            add = pawssible_patches(s,g[1:], l - 1)
+            remove = pawssible_patches(s[1:], g, l - 1)
+            sub = pawssible_patches(s[1:],g[1:], l - 1)
+            return 1 + min(add,remove,sub)
     else:
-        add_diff = ... # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
+        return 0
+
+
+
+
+    '''def add_diff(s,g,l):
+        i = 0
+        if l >= 0 and s != g:
+            while i < min(len(s),len(g)):
+                print(i)
+                if i > 0 and s[i] != g[i] and g[i+1] == s[i] :
+                    print(i, s[:i] + g[i-1] + s[i- 1:])
+                    return s[:i] + g[i] + s[i:]
+                elif i == 0 and s[i] != g[i] and g[i+1] == s[i] :
+                
+                    return g[i] + s[i:]
+                i += 1
+            return s            
+        else:                    
+            return s
+    
+    def remove_diff(s,g,l):
+        if l >= 0 and s != g:
+            if len(s) <= len(g):
+                for i in range(min(len(s),len(g))):
+                    
+                    if i == 0 and s[i] != g[i] and   s[i+1] == g[i] :
+                        print( s[i+1:])
+                        return s[i+1:]
+                    elif i > 0 and s[i-1] != g[i-1] and s[i] == g[i-1]:
+                        print(s[:i] + s[i+1:])
+                        return s[:i-1] + s[i:]
+            elif len(s) > len(g):
+                for i in range(min(len(s),len(g))):
+                   
+                    if s[i] != g[i] and s[i+1] == g[i]:
+                        
+                        return s[:i] + s[i+1:]
+                    elif s[:i+1] == g[:i+1]:
+                        
+                        return s[:i+1]
+            return s
+        else:                    
+            return s
+    
+    def substitute_diff(s,g,l):
+        for i in range(min(len(s),len(g))):
+            if s[i] != g[i] and i < (len(s) - 1):
+              
+                return s[:i] + g[i] + s[i+1:]
+            elif s[i] != g[i] and i == len(s) - 1:
+                
+                return s[:i] + g[i]
+        return s
+
+    if l >= 0:   
+        if s == g:
+            return 0
+        elif len(s) <= len(g) and add_diff(s, g, l) != s:
+            return  1 + pawssible_patches(add_diff(s, g, l - 1), g, l - 1)
+        elif len(s) >= len(g) and remove_diff(s, g, l) != s:
+            
+            return  1 + pawssible_patches(remove_diff(s, g, l - 1), g, l - 1) 
+        elif substitute_diff(s, g, l) != s:
+            return  1 + pawssible_patches(substitute_diff(s, g, l - 1), g, l - 1)
+        else:
+            return 0
+    else:
+        return 0
+    
+    '''
+    
+    '''abs_diff = abs(len(goal) - len(start))
+        if limit >= 0:
+        if start == '' or goal == '':
+            return abs_diff
+        elif start[-1] != goal[-1]:
+            if len(goal) >=2 and len(goal) >= len(start) and add_diff(start, goal):
+                return 1 + pawssible_patches((start + goal[-1])[:-1], goal[:-1], limit - 1)
+            elif len(start) >= 2 and len(goal) <= len(start) and remove_diff(start, goal):
+                return 1 + pawssible_patches(start[:-2], goal[:-1], limit - 1)
+            else:
+                return substitute_diff(start, goal) + pawssible_patches(start[:-1], goal[:-1], limit - 1)    
+        else:
+            return pawssible_patches(start[:-1], goal[:-1], limit)
+    else:
+        return 0
+    '''
+        
+    
         # BEGIN
-        "*** YOUR CODE HERE ***"
+        
         # END
 
 
@@ -148,7 +267,16 @@ def final_diff(start, goal, limit):
 def report_progress(typed, prompt, user_id, send):
     """Send a report of your id and progress so far to the multiplayer server."""
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    typed_count = 0
+    for i in range(len(typed)):
+        if typed[i] == prompt[i]:
+            typed_count += 1
+        else:
+            break
+    progress = typed_count / len(prompt)
+    d = {'id':user_id,'progress':progress}
+    send(d)
+    return progress
     # END PROBLEM 8
 
 
@@ -174,7 +302,9 @@ def time_per_word(times_per_player, words):
         words: a list of words, in the order they are typed.
     """
     # BEGIN PROBLEM 9
-    "*** YOUR CODE HERE ***"
+
+    times = [[player[i]-player[i-1] for i in range(len(player)) if i > 0] for player in times_per_player ]
+    return game(words,times)
     # END PROBLEM 9
 
 
@@ -189,7 +319,19 @@ def fastest_words(game):
     player_indices = range(len(all_times(game)))  # contains an *index* for each player
     word_indices = range(len(all_words(game)))    # contains an *index* for each word
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    player_time = all_times(game)
+    word = all_words(game)
+    d = {}
+    out = [[] for i in player_time]
+    for i in word_indices:    
+        for j in player_indices:
+            if player_time[j][i] == min([player_time[j][i] for j in player_indices]):
+                d[word[i]] = j
+                break
+    for key, value in d.items():
+        out[value] .append( key)
+            
+    return out
     # END PROBLEM 10
 
 
